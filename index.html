@@ -75,16 +75,19 @@
           </div>
         </div>
         <div class="results" aria-live="polite">
-          <div class="result-header"><p id="summary">已显示全部 1 条订单</p><button class="clear" id="clearButton" type="button">清空条件</button></div>
+          <div class="result-header"><p id="summary">正在加载订单</p><button class="clear" id="clearButton" type="button">清空条件</button></div>
           <div class="result-list" id="resultList"></div>
         </div>
       </section>
       <p class="note">数据来源：原始数据 快递查询.xlsx。为保护信息安全，请仅在授权范围内使用本页面。</p>
     </main>
     <script>
-      // 将新记录按相同字段补充到这里，即可扩展本地查询数据。
+      // 物流数据同步自“原始数据 快递查询.xlsx”。新增记录后请同时更新本数组。
       const orders = [
-        { name: "谢大侠", phone: "17755558974", address: "广东省深圳市南山区牛逼街道超级大厦111", orderNo: "123654789987455", carrier: "顺达", trackingNo: "SD9526478113" }
+        { name: "谢大侠", phone: "17755558974", address: "广东省深圳市南山区牛逼街道超级大厦111", orderNo: "123654789987455", carrier: "顺达", trackingNo: "SD9526478113" },
+        { name: "李小龙", phone: "15688889999", address: "山东省济南市", orderNo: "321654789987895", carrier: "韵通", trackingNo: "YT913756248" },
+        { name: "王大明", phone: "15688889977", address: "北京市", orderNo: "455654789621453", carrier: "快闪", trackingNo: "KS167248593" },
+        { name: "朱题", phone: "15688889912", address: "广东省广州市天河区", orderNo: "426854789989173", carrier: "京西", trackingNo: "JX2456891741254" }
       ];
       const labels = { name: "姓名", phone: "电话", address: "地址", orderNo: "订单号", carrier: "快递公司", trackingNo: "物流单号" };
       const keyword = document.querySelector('#keyword');
@@ -99,8 +102,13 @@
         const filtersMatch = filters.every(input => !input.value.trim() || includes(order[input.dataset.field], input.value));
         return keywordMatch && filtersMatch;
       }
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, character => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        })[character]);
+      }
       function card(order) {
-        return `<article class="order"><div class="datum"><small>订单号</small><strong>${order.orderNo}</strong></div><div class="datum"><small>快递公司</small><strong>${order.carrier}</strong></div><div class="datum tracking"><small>物流单号</small><strong>${order.trackingNo}</strong></div></article>`;
+        return `<article class="order"><div class="datum"><small>订单号</small><strong>${escapeHtml(order.orderNo)}</strong></div><div class="datum"><small>快递公司</small><strong>${escapeHtml(order.carrier)}</strong></div><div class="datum tracking"><small>物流单号</small><strong>${escapeHtml(order.trackingNo)}</strong></div></article>`;
       }
       function render() {
         const found = orders.filter(matches);
